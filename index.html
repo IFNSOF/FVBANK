@@ -1,116 +1,104 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вход / Регистрация</title>
+    <title>Supabase Auth</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(to right, #ff7e5f, #feb47b);
-        }
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
+        body { font-family: Arial, sans-serif; }
+        .hidden { display: none; }
+        #main-menu { margin-top: 20px; }
+        #balance { margin-left: 20px; }
+        #auth-form { display: flex; flex-direction: column; }
+        input { margin-bottom: 10px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>Вход / Регистрация</h2>
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" id="email" placeholder="Введите ваш email" required>
-        </div>
-        <div class="form-group">
-            <label for="password">Пароль:</label>
-            <input type="password" id="password" placeholder="Введите ваш пароль" required>
-        </div>
-        <button onclick="signUp()">Регистрация</button>
-        <button onclick="signIn()">Войти</button>
-        <div id="message"></div>
+
+<div id="auth-form" class="hidden">
+    <h2>Register or Login</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button id="register-btn">Register</button>
+    <button id="login-btn">Login</button>
+</div>
+
+<div id="main-menu" class="hidden">
+    <div>
+        <h2>Welcome <span id="user-id"></span></h2>
+        <h3>Balance: $<span id="balance">00.00</span></h3>
     </div>
+</div>
 
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js"></script>
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBYNUoD8_pXptlFVysVcYfbmrHe6wM5JCk",
-            authDomain: "fvbank-1ddcf.firebaseapp.com",
-            databaseURL: "https://fvbank-1ddcf-default-rtdb.firebaseio.com",
-            projectId: "fvbank-1ddcf",
-            storageBucket: "fvbank-1ddcf.firebasestorage.app",
-            messagingSenderId: "155681386831",
-            appId: "1:155681386831:web:05cd9a00929b5b94f4d53a"
-        };
+<script>
+    // Set up Supabase connection
+    const supabaseUrl = 'https://your-project.supabase.co'; // Замените на ваш Supabase URL
+    const supabaseKey = 'your-api-key'; // Замените на ваш Supabase API Key
+    const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-        const app = firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
+    const authForm = document.getElementById('auth-form');
+    const mainMenu = document.getElementById('main-menu');
+    const registerBtn = document.getElementById('register-btn');
+    const loginBtn = document.getElementById('login-btn');
+    const userIdElem = document.getElementById('user-id');
+    const balanceElem = document.getElementById('balance');
 
-        function signUp() {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
+    // Функция для регистрации пользователя
+    registerBtn.addEventListener('click', async () => {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
 
-            auth.createUserWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    document.getElementById("message").innerHTML = "Регистрация успешна!";
-                })
-                .catch((error) => {
-                    const errorMessage = error.message;
-                    document.getElementById("message").innerHTML = "Ошибка: " + errorMessage;
-                });
+        const { user, error } = await supabase.auth.signUp({
+            email: username,
+            password: password,
+        });
+
+        if (error) {
+            alert('Error: ' + error.message);
+        } else {
+            alert('Registration successful! Please log in.');
         }
+    });
 
-        function signIn() {
-            const email = document.getElementById("email").value;
-            const password = document.getElementById("password").value;
+    // Функция для входа пользователя
+    loginBtn.addEventListener('click', async () => {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
 
-            auth.signInWithEmailAndPassword(email, password)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    document.getElementById("message").innerHTML = "Вход успешен!";
-                    // Перенаправление на главную страницу
-                    window.location.href = "dashboard.html";
-                })
-                .catch((error) => {
-                    const errorMessage = error.message;
-                    document.getElementById("message").innerHTML = "Ошибка: " + errorMessage;
-                });
+        const { user, error } = await supabase.auth.signInWithPassword({
+            email: username,
+            password: password,
+        });
+
+        if (error) {
+            alert('Error: ' + error.message);
+        } else {
+            showMainMenu(user);
         }
-    </script>
+    });
+
+    // Функция для отображения главного меню
+    async function showMainMenu(user) {
+        authForm.classList.add('hidden');
+        mainMenu.classList.remove('hidden');
+        userIdElem.textContent = user.id;
+
+        // Запрос баланса пользователя
+        const { data, error } = await supabase
+            .from('balances') // Предполагается, что у вас есть таблица 'balances'
+            .select('balance')
+            .eq('user_id', user.id)
+            .single();
+
+        if (data) {
+            balanceElem.textContent = data.balance.toFixed(2);
+        } else {
+            balanceElem.textContent = '00.00'; // Если баланс не найден, отображаем 00.00
+        }
+    }
+</script>
+
 </body>
 </html>
+
