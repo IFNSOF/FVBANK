@@ -1,1 +1,41 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FavixBank</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js"></script>
+</head>
+<body>
+    <div id="auth-container">
+        <button id="login-btn">Войти через Google</button>
+    </div>
+    
+    <div id="user-container" style="display:none;">
+        <div id="user-info">
+            <p>ID: <span id="user-id"></span></p>
+            <p>Баланс: <span id="balance">00.00$</span></p>
+        </div>
+        <button id="transfer-btn">Перевести</button>
+    </div>
+
+    <div id="transfer-container" style="display:none;">
+        <input type="text" id="transfer-id" placeholder="ID получателя">
+        <input type="number" id="transfer-amount" placeholder="Сумма перевода">
+        <button id="confirm-transfer">Подтвердить перевод</button>
+    </div>
+
+    <div id="confirmation-container" style="display:none;">
+        <p>Чек перевода</p>
+        <p>Сумма перевода: <span id="transfer-amount-confirm"></span></p>
+        <p>Спасибо за использование FavixBank!</p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
 
