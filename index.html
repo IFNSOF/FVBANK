@@ -1,41 +1,119 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="uk">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FavixBank</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js"></script>
+<meta charset="UTF-8">
+<title>Замовлення iPhone</title>
+<style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    nav { margin-bottom: 20px; }
+    nav button { padding: 10px; margin-right: 10px; cursor: pointer; }
+    .tab { display: none; }
+    .tab.active { display: block; }
+    input, select, button { padding: 8px; margin-top: 10px; display: block; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    table, th, td { border: 1px solid black; }
+    th, td { padding: 8px; text-align: center; }
+</style>
 </head>
 <body>
-    <div id="auth-container">
-        <button id="login-btn">Войти через Google</button>
-    </div>
-    
-    <div id="user-container" style="display:none;">
-        <div id="user-info">
-            <p>ID: <span id="user-id"></span></p>
-            <p>Баланс: <span id="balance">00.00$</span></p>
-        </div>
-        <button id="transfer-btn">Перевести</button>
-    </div>
 
-    <div id="transfer-container" style="display:none;">
-        <input type="text" id="transfer-id" placeholder="ID получателя">
-        <input type="number" id="transfer-amount" placeholder="Сумма перевода">
-        <button id="confirm-transfer">Подтвердить перевод</button>
-    </div>
+<nav>
+    <button onclick="openTab('orderTab')">Нове замовлення</button>
+    <button onclick="openTab('listTab')">Список замовлень</button>
+</nav>
 
-    <div id="confirmation-container" style="display:none;">
-        <p>Чек перевода</p>
-        <p>Сумма перевода: <span id="transfer-amount-confirm"></span></p>
-        <p>Спасибо за использование FavixBank!</p>
-    </div>
+<!-- Вкладка замовлення -->
+<div id="orderTab" class="tab active">
+    <h2>Нове замовлення</h2>
+    <label>Модель iPhone:</label>
+    <select id="model">
+        <option value="11">iPhone 11</option>
+        <option value="11 Pro">iPhone 11 Pro</option>
+        <option value="11 Pro Max">iPhone 11 Pro Max</option>
+        <option value="12">iPhone 12</option>
+        <option value="12 Pro">iPhone 12 Pro</option>
+        <option value="12 Pro Max">iPhone 12 Pro Max</option>
+        <option value="13">iPhone 13</option>
+        <option value="13 Pro">iPhone 13 Pro</option>
+        <option value="13 Pro Max">iPhone 13 Pro Max</option>
+        <option value="14">iPhone 14</option>
+        <option value="14 Pro">iPhone 14 Pro</option>
+        <option value="14 Pro Max">iPhone 14 Pro Max</option>
+        <option value="15">iPhone 15</option>
+        <option value="15 Pro">iPhone 15 Pro</option>
+        <option value="15 Pro Max">iPhone 15 Pro Max</option>
+        <option value="16">iPhone 16</option>
+        <option value="16 Pro">iPhone 16 Pro</option>
+        <option value="16 Pro Max">iPhone 16 Pro Max</option>
+    </select>
 
-    <script src="script.js"></script>
+    <label>Пам’ять:</label>
+    <select id="memory">
+        <option value="128">128 ГБ</option>
+        <option value="256">256 ГБ</option>
+        <option value="512">512 ГБ</option>
+    </select>
+
+    <label>Ціна (грн):</label>
+    <input type="number" id="price" placeholder="Введіть ціну">
+
+    <button onclick="addOrder()">Підтвердити</button>
+</div>
+
+<!-- Вкладка списку -->
+<div id="listTab" class="tab">
+    <h2>Список замовлень</h2>
+    <table id="ordersTable">
+        <thead>
+            <tr>
+                <th>Модель</th>
+                <th>Пам’ять</th>
+                <th>Ціна (грн)</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<script>
+function openTab(tabId) {
+    document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    if (tabId === 'listTab') loadOrders();
+}
+
+function addOrder() {
+    const model = document.getElementById('model').value;
+    const memory = document.getElementById('memory').value;
+    const price = document.getElementById('price').value;
+
+    if (!price) {
+        alert('Введіть ціну!');
+        return;
+    }
+
+    let orders = JSON.parse(localStorage.getItem('orders')) || [];
+    orders.push({ model, memory, price });
+    localStorage.setItem('orders', JSON.stringify(orders));
+
+    alert('Замовлення додано!');
+    document.getElementById('price').value = '';
+}
+
+function loadOrders() {
+    const tbody = document.querySelector('#ordersTable tbody');
+    tbody.innerHTML = '';
+    const orders = JSON.parse(localStorage.getItem('orders')) || [];
+    orders.forEach(order => {
+        const row = `<tr>
+            <td>${order.model}</td>
+            <td>${order.memory} ГБ</td>
+            <td>${order.price}</td>
+        </tr>`;
+        tbody.innerHTML += row;
+    });
+}
+</script>
+
 </body>
 </html>
-
-
